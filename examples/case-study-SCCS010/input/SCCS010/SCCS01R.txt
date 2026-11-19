@@ -1,0 +1,6 @@
+       01  SCCS01R.
+         03  BEFR-CNVR-QTY               PIC  X(20).
+         03  INT-DNUM-DAT                PIC  9(02).
+         03  DEC-DNUM-DAT                PIC  9(02).
+         03  AFTR-CNVR-QTY               PIC  S9(13)V9(05).
+         03  RTN-CD                      PIC  X(02).

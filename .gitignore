@@ -1,0 +1,8 @@
+.work/
+__pycache__/
+*.pyc
+# per-conversion data: customer sources and generated files stay local
+input/*
+!input/.gitkeep
+output/*
+!output/.gitkeep

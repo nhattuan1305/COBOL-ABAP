@@ -1,0 +1,344 @@
+{
+ "defaults": {
+  "INT_DNUM_DAT": 13,
+  "DEC_DNUM_DAT": 5
+ },
+ "cases": [
+  {
+   "id": "T1",
+   "in": {
+    "BEFR_CNVR_QTY": "1234"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "1234",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T2",
+   "in": {
+    "BEFR_CNVR_QTY": "-1,234.56"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "-1234.56",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T3",
+   "in": {
+    "BEFR_CNVR_QTY": "1,234,567.89"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "1234567.89",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T4",
+   "in": {
+    "BEFR_CNVR_QTY": "-.5"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "-0.5",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T5",
+   "in": {
+    "BEFR_CNVR_QTY": "  12.5 "
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "12.5",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T6",
+   "in": {
+    "BEFR_CNVR_QTY": "12."
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "12",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T7",
+   "in": {
+    "BEFR_CNVR_QTY": "9999999999999.99999"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "9999999999999.99999",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T8",
+   "in": {
+    "BEFR_CNVR_QTY": "12 34"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T9",
+   "in": {
+    "BEFR_CNVR_QTY": "1,23.4"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T10",
+   "in": {
+    "BEFR_CNVR_QTY": ",123"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T11",
+   "in": {
+    "BEFR_CNVR_QTY": "1.2,3"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T12",
+   "in": {
+    "BEFR_CNVR_QTY": "12a"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T13",
+   "in": {
+    "BEFR_CNVR_QTY": "5-"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T14",
+   "in": {
+    "BEFR_CNVR_QTY": "--5"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T15",
+   "in": {
+    "BEFR_CNVR_QTY": "1.2.3"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T16",
+   "in": {
+    "BEFR_CNVR_QTY": "123456",
+    "INT_DNUM_DAT": 5
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T17",
+   "in": {
+    "BEFR_CNVR_QTY": "1.234567"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T18",
+   "in": {
+    "BEFR_CNVR_QTY": "1",
+    "INT_DNUM_DAT": 14
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T19",
+   "in": {
+    "BEFR_CNVR_QTY": "1",
+    "DEC_DNUM_DAT": 6
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T20",
+   "in": {
+    "BEFR_CNVR_QTY": "1",
+    "INT_DNUM_DAT": 0,
+    "DEC_DNUM_DAT": 0
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T21",
+   "in": {
+    "BEFR_CNVR_QTY": "1,234,"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T22",
+   "in": {
+    "BEFR_CNVR_QTY": ""
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T23",
+   "in": {
+    "BEFR_CNVR_QTY": "1,23"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "123",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T24",
+   "in": {
+    "BEFR_CNVR_QTY": "12345,678"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "12345678",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T25",
+   "in": {
+    "BEFR_CNVR_QTY": "- 5"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "-5",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T26",
+   "in": {
+    "BEFR_CNVR_QTY": "."
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T27",
+   "in": {
+    "BEFR_CNVR_QTY": "-"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T28",
+   "in": {
+    "BEFR_CNVR_QTY": "              1,234,"
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "1234",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T29",
+   "in": {
+    "BEFR_CNVR_QTY": "                 1 ."
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "1",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T30",
+   "in": {
+    "BEFR_CNVR_QTY": ".5",
+    "INT_DNUM_DAT": 0
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0.5",
+    "RTN_CD": "OK"
+   }
+  },
+  {
+   "id": "T31",
+   "in": {
+    "BEFR_CNVR_QTY": "0.5",
+    "INT_DNUM_DAT": 0
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "T32",
+   "in": {
+    "BEFR_CNVR_QTY": "1",
+    "INT_DNUM_DAT": {
+     "raw": "1 "
+    }
+   },
+   "expect": {
+    "AFTR_CNVR_QTY": "0",
+    "RTN_CD": "NG"
+   }
+  },
+  {
+   "id": "P1",
+   "in": {
+    "BEFR_CNVR_QTY": "1,2345.6"
+   }
+  }
+ ]
+}

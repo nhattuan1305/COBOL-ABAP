@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "sap-docs": {
+      "type": "http",
+      "url": "https://mcp-sap-docs.marianzeis.de/mcp"
+    },
+    "sap-abap": {
+      "type": "http",
+      "url": "https://mcp-abap.marianzeis.de/mcp"
+    }
+  }
+}

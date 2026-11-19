@@ -1,0 +1,354 @@
+!ADD!  PROCESS APOST GRAPHIC CVTPICGGRAPHIC CHGPOSSGN STDINZHEX00.
+       IDENTIFICATION         DIVISION.
+!UPD!  PROGRAM-ID. SCCS010  IS  INITIAL.
+       AUTHOR.                H.ARAMAKI.
+       DATE-WRITTEN. 01-06-27.
+       DATE-COMPILED.
+      **
+      **PROGRAM-SPECIFICATION:
+      **         SCCS010
+      **IDENTIFICATION-DEFINITION:
+      **GROUP-ID:
+      **         TST
+      **SUMMARY:
+      **         （精）統合  数値項目桁数チェック
+      * -------------------------------------------------------------- *
+      *| 日付 | 修正・変更内容                                |USER-ID|*
+      * -------------------------------------------------------------- *
+      *|      |                                               |       |*
+      * -------------------------------------------------------------- *
+      **LANGUAGE:
+      **         COBOL
+      **PATTERN-ID:
+      **         FREEPTRN
+      **FUNCTION:
+      **
+      **         （精機）統合管理システム
+      **                   数値編集項目、整数部桁数、小数部桁数を
+      **                 受け、桁数チェック及び  【、】【．】【－】
+      **                 の位置を判定し、結果を返す
+      **                 （旧ＸＥＨ０４０）
+      **ADDITIONAL-PARTS-DEFINE-START:
+      **PARTS-NAME:
+      **ADDITIONAL-PARTS-DEFINE-END:
+      **VARIABLE-SYMBOL-DEFINITION:
+      **PLACE    NAME/VARIABLE SYMBOL   FORMAL SYMBOL
+      ********** FREEPTRN
+      **           ?PROGRAMER-NAME        H.ARAMAKI
+      **ADDITIONAL-PARTS-VAR.SYMBOL-DEFINE-START:
+      **PLACE    NAME/VARIABLE SYMBOL   FORMAL SYMBOL
+      **ADDITIONAL-PARTS-VAR.SYMBOL-DEFINE-END:
+      **
+       ENVIRONMENT            DIVISION.
+       CONFIGURATION          SECTION.
+!UPD!  SOURCE-COMPUTER.       IBM-I-SERIES.
+!UPD!  OBJECT-COMPUTER.       IBM-I-SERIES.
+       SPECIAL-NAMES.
+                              C01       IS   PCHANGE.
+!ADD!      DATA-AREA  IS  DTAARA.
+       INPUT-OUTPUT           SECTION.
+       FILE-CONTROL.
+       DATA                   DIVISION.
+       FILE                   SECTION.
+       WORKING-STORAGE        SECTION.
+
+!ADD! *＊＊コンバート・ワーク用コピー句＊＊
+!ADD!      COPY CVTCOMMON.
+      **USER-S000:
+       01  WORK-AREA.
+         03  CHECK-FLG             PIC  X(03).
+      *
+         03  DIGIT-FLG             PIC  X(03).
+         03  MINUS-FLG             PIC  X(03).
+         03  PERIOD-FLG            PIC  X(03).
+         03  DELIMIT-FLG           PIC  X(03).
+         03  SPACE-FLG             PIC  X(03).
+         03  BYTE-BEFORE           PIC  X(06).
+      *
+         03  COUNT-AREA.
+           05  IX                  PIC  9(02).
+           05  IA                  PIC  9(02).
+           05  IB                  PIC  9(02).
+           05  DELIMIT-CNT         PIC  9(02).
+           05  INT-DNUM-CNT        PIC  9(02).
+           05  DEC-DNUM-CNT        PIC  9(02).
+      *
+         03  PERIOD-DIGIT          PIC  9(02).
+      *
+         03  BEFORE-TABLE.
+           05  BEFORE-TBL          PIC  X(01)      OCCURS  20.
+      *
+         03  INT-DNUM-DIGIT-X      PIC  X(02).
+         03  DEC-DNUM-DIGIT-X      PIC  X(02).
+      *
+         03  INT-DNUM-X.
+           05  INT-DNUM-9          PIC  9(13).
+         03  DEC-DNUM-X.
+           05  DEC-DNUM-9          PIC  V9(05).
+      *
+         03  INT-DNUM-TABLE.
+           05  INT-DNUM-TBL        PIC  X(01)      OCCURS  13.
+         03  DEC-DNUM-TABLE.
+           05  DEC-DNUM-TBL        PIC  X(01)      OCCURS  5.
+      *
+      **USER-E:
+      **
+       LINKAGE                SECTION.
+      **USER-S001:
+           COPY  SCCS01R  SUPPRESS.
+      **USER-E:
+       PROCEDURE              DIVISION  USING    SCCS01R.
+      **USER-S002:
+      *    ++---------------------------------------------------------++
+      *    ++      MAIN-PROC                                          ++
+      *    ++---------------------------------------------------------++
+       MAIN-PROC                   SECTION.
+       MAIN-PROC-000.
+      *
+           MOVE  ZERO                  TO   AFTR-CNVR-QTY OF SCCS01R.
+           MOVE  'NG'                  TO   RTN-CD        OF SCCS01R.
+           MOVE  SPACE                 TO   CHECK-FLG.
+      *
+      *整数部、小数部の桁数チェック
+      *
+           PERFORM  CHECK1-PROC.
+      *
+      *入力項目チェック
+      *
+           IF  ( CHECK-FLG  =  SPACE                                  )
+            THEN
+               PERFORM  CHECK2-PROC
+            ELSE
+               CONTINUE
+           END-IF.
+      *
+      *入力項目編集（Ｚか－を９に）
+      *
+           IF  ( CHECK-FLG  =  SPACE                                  )
+            THEN
+               PERFORM  ITEM-SET-PROC
+            ELSE
+               CONTINUE
+           END-IF.
+       MAIN-PROC-999.
+!DEL! *    EXIT PROGRAM.
+!ADD!      GOBACK.
+      *    ++---------------------------------------------------------++
+      *    ++      CHECK1-PROC   ...   整数部、小数部の桁数チェック   ++
+      *    ++---------------------------------------------------------++
+       CHECK1-PROC                 SECTION.
+       CHECK1-PROC-000.
+      *
+           MOVE  INT-DNUM-DAT OF SCCS01R    TO   INT-DNUM-DIGIT-X.
+      *
+           IF  ( INT-DNUM-DIGIT-X  NUMERIC                            )
+            THEN
+               IF  ( INT-DNUM-DAT OF SCCS01R  <=  13                  )
+                THEN
+                   CONTINUE
+                ELSE
+                   MOVE  'ERR'              TO   CHECK-FLG
+               END-IF
+            ELSE
+               MOVE  'ERR'                  TO   CHECK-FLG
+           END-IF.
+      *
+           MOVE  DEC-DNUM-DAT OF SCCS01R    TO   DEC-DNUM-DIGIT-X.
+      *
+           IF  ( DEC-DNUM-DIGIT-X  NUMERIC                            )
+            THEN
+               IF  ( DEC-DNUM-DAT OF SCCS01R  <=  05                  )
+                THEN
+                   CONTINUE
+                ELSE
+                   MOVE  'ERR'              TO   CHECK-FLG
+               END-IF
+            ELSE
+               MOVE  'ERR'                  TO   CHECK-FLG
+           END-IF.
+       CHECK1-PROC-999.
+           EXIT.
+      *    ++---------------------------------------------------------++
+      *    ++      CHECK2-PROC   ...   入力項目をチェック             ++
+      *    ++---------------------------------------------------------++
+       CHECK2-PROC                 SECTION.
+       CHECK2-PROC-000.
+      *
+           INITIALIZE  COUNT-AREA.
+      *
+           MOVE  'NOT'                      TO   DIGIT-FLG.
+           MOVE  'NOT'                      TO   PERIOD-FLG.
+           MOVE  'NOT'                      TO   SPACE-FLG
+           MOVE  'NOT'                      TO   MINUS-FLG.
+           MOVE  'NOT'                      TO   DELIMIT-FLG.
+           MOVE  SPACE                      TO   BYTE-BEFORE.
+           MOVE  ZERO                       TO   COUNT-AREA.
+           MOVE  BEFR-CNVR-QTY OF SCCS01R   TO   BEFORE-TABLE.
+      *
+           PERFORM  VARYING IX FROM 1 BY 1  UNTIL IX > 20
+               EVALUATE  BEFORE-TBL (IX)
+                WHEN  '-'
+                   IF  ( MINUS-FLG  =  'NOT'                          )
+                    THEN
+                       IF  ( PERIOD-FLG   =  'NOT'                    )
+                       AND ( DELIMIT-FLG  =  'NOT'                    )
+                       AND ( DIGIT-FLG    =  'NOT'                    )
+                        THEN
+                           CONTINUE
+                        ELSE
+                           MOVE  'ERR'           TO   CHECK-FLG
+                       END-IF
+                    ELSE
+                       MOVE  'ERR'               TO   CHECK-FLG
+                   END-IF
+                   MOVE  'ON '                   TO   MINUS-FLG
+                WHEN  '.'
+                   IF  ( PERIOD-FLG  =  'NOT'                         )
+                    THEN
+                       IF  ( DELIMIT-FLG  =  'ON '                    )
+                        THEN
+                           IF  ( DELIMIT-CNT  =  3                    )
+                            THEN
+                               CONTINUE
+                            ELSE
+                               MOVE  'ERR'            TO   CHECK-FLG
+                           END-IF
+                        ELSE
+                           CONTINUE
+                       END-IF
+                    ELSE
+                       MOVE  'ERR'          TO   CHECK-FLG
+                   END-IF
+                   MOVE  'ON '              TO   PERIOD-FLG
+                   MOVE  'ON '              TO   DIGIT-FLG
+                   MOVE  'PERIOD'           TO   BYTE-BEFORE
+                   MOVE  IX                 TO   PERIOD-DIGIT
+                WHEN  ','
+                   IF  ( PERIOD-FLG  =  'ON '                         )
+                    THEN
+                       MOVE  'ERR'          TO   CHECK-FLG
+                    ELSE
+                       IF  ( DELIMIT-FLG  =  'ON '                    )
+                        THEN
+                           IF  ( DELIMIT-CNT  =  3                    )
+                            THEN
+                               MOVE  ZERO       TO   DELIMIT-CNT
+                            ELSE
+                               MOVE  'ERR'      TO   CHECK-FLG
+                           END-IF
+                        ELSE
+                           IF  ( DIGIT-FLG  =  'ON '                  )
+                            THEN
+                               MOVE  ZERO       TO   DELIMIT-CNT
+                            ELSE
+                               MOVE  'ERR'      TO   CHECK-FLG
+                           END-IF
+                       END-IF
+                   END-IF
+                   MOVE  'ON '              TO   DELIMIT-FLG
+                   MOVE  'DELIMI'           TO   BYTE-BEFORE
+                WHEN  SPACE
+                   IF  ( DIGIT-FLG  =  'ON '                          )
+                    THEN
+                       IF  ( SPACE-FLG  =  'ON '                      )
+                        THEN
+                           IF  ( BYTE-BEFORE  =  'SPACE '             )
+                            THEN
+                               CONTINUE
+                            ELSE
+                               MOVE  'ERR'       TO   CHECK-FLG
+                           END-IF
+                        ELSE
+                           IF  ( BYTE-BEFORE  =  'DIGIT ' OR 'PERIOD' )
+                            THEN
+                               CONTINUE
+                            ELSE
+                               MOVE  'ERR'      TO   CHECK-FLG
+                           END-IF
+                       END-IF
+                       MOVE  'ON '          TO   SPACE-FLG
+                    ELSE
+                       CONTINUE
+                   END-IF
+                   MOVE  'SPACE '           TO   BYTE-BEFORE
+                WHEN  '0' THRU '9'
+                   IF  ( SPACE-FLG  =  'ON '                          )
+                    THEN
+                       MOVE  'ERR'          TO   CHECK-FLG
+                    ELSE
+                       CONTINUE
+                   END-IF
+                   IF  ( PERIOD-FLG  =  'NOT'                         )
+                    THEN
+                       ADD   +1             TO   INT-DNUM-CNT
+                       ADD   +1             TO   DELIMIT-CNT
+                       COMPUTE  PERIOD-DIGIT  =  IX  +  1
+                    ELSE
+                       ADD   +1             TO   DEC-DNUM-CNT
+                   END-IF
+                   MOVE  'ON '              TO   DIGIT-FLG
+                   MOVE  'DIGIT '           TO   BYTE-BEFORE
+                WHEN  OTHER
+                   MOVE  'ERR'              TO   CHECK-FLG
+                   MOVE  '??????'           TO   BYTE-BEFORE
+               END-EVALUATE
+           END-PERFORM.
+      *
+           IF  ( INT-DNUM-CNT  >  INT-DNUM-DAT OF SCCS01R             )
+            THEN
+               MOVE  'ERR'             TO   CHECK-FLG
+            ELSE
+               CONTINUE
+           END-IF.
+      *
+           IF  ( DEC-DNUM-CNT  >  DEC-DNUM-DAT OF SCCS01R             )
+            THEN
+               MOVE  'ERR'             TO   CHECK-FLG
+            ELSE
+               CONTINUE
+           END-IF.
+       CHECK2-PROC-999.
+           EXIT.
+      *    ++---------------------------------------------------------++
+      *    ++      ITEM-SET-PROC   ...   入力項目編集                 ++
+      *    ++---------------------------------------------------------++
+       ITEM-SET-PROC               SECTION.
+       ITEM-SET-PROC-000.
+      *
+           MOVE  ZERO                  TO   INT-DNUM-TABLE.
+           MOVE  ZERO                  TO   DEC-DNUM-TABLE.
+      *
+           COMPUTE  IA  =  13  -  INT-DNUM-CNT.
+           MOVE  ZERO                  TO   IB.
+      *
+           PERFORM  VARYING IX FROM 1 BY 1  UNTIL  IX > 20
+               IF  ( BEFORE-TBL (IX)  NUMERIC                         )
+                THEN
+                   IF  ( IX  <  PERIOD-DIGIT                          )
+                    THEN
+                       ADD   +1                  TO   IA
+                       MOVE  BEFORE-TBL (IX)     TO   INT-DNUM-TBL (IA)
+                    ELSE
+                       ADD   +1                  TO   IB
+                       MOVE  BEFORE-TBL (IX)     TO   DEC-DNUM-TBL (IB)
+                   END-IF
+                ELSE
+                   CONTINUE
+               END-IF
+           END-PERFORM.
+      *
+           MOVE  INT-DNUM-TABLE        TO   INT-DNUM-X.
+           MOVE  DEC-DNUM-TABLE        TO   DEC-DNUM-X.
+           IF  ( MINUS-FLG  =  'ON '                                  )
+            THEN
+               COMPUTE  AFTR-CNVR-QTY OF SCCS01R  =
+                                   ( INT-DNUM-9  +  DEC-DNUM-9 )  *  -1
+            ELSE
+               COMPUTE  AFTR-CNVR-QTY OF SCCS01R  =
+                                     INT-DNUM-9  +  DEC-DNUM-9
+           END-IF.
+      *
+           MOVE  'OK'                  TO   RTN-CD OF SCCS01R.
+       ITEM-SET-PROC-999.
+           EXIT.
+      **USER-E:

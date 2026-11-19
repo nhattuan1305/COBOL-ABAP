@@ -1,0 +1,18 @@
+      ****************************************************************
+      *    CONVERTã§í ÉRÉsÅ[ãÂ                                     *
+      ****************************************************************
+       01  CVT-BATCH-AREA.
+           02  CVT-DATE6          PIC  X(06)  VALUE SPACE.
+           02  CVT-DATE8          PIC  X(08)  VALUE SPACE.
+           02  CVT-DAY            PIC  X(05)  VALUE SPACE.
+           02  CVT-CURDATE        PIC  X(08)  VALUE SPACE.
+           02  CVT-CURDATE2       PIC  X(40)  VALUE SPACE.
+           02  CVT-SYSIN          PIC  X(80)  VALUE SPACE.
+           02  CVT-CONSOLE        PIC  X(80)  VALUE SPACE.
+           02  SHIFT-OUT          PIC  X(01)  VALUE X'0E'.
+           02  SHIFT-IN           PIC  X(01)  VALUE X'0F'.
+           02  CVT-RTNCD          PIC  9(04)  VALUE ZERO.
+           02  PARM-LEN           PIC S9(04)  VALUE 68.
+       01  REG-AREA.
+           02  TALLY              PIC  9(05)  COMP-4.
+      *
